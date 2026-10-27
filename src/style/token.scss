@@ -1,0 +1,57 @@
+// Jetons de design : couleurs, typographie, rayons. Thème sombre par défaut, clair via data-theme="light".
+
+:root {
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --violet: #8b5cf6;
+  --pink: #f626af;
+  --mint: #16f2b3;
+  --grad: linear-gradient(90deg, #8b5cf6 0%, #f626af 100%);
+
+  --radius: 14px;
+  --radius-lg: 20px;
+  --nav-h: 72px;
+}
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0d1224;
+  --bg-panel: #101123;
+  --bg-soft: #151a33;
+  --line: #2a2e5a;
+  --line-soft: rgba(255, 255, 255, 0.08);
+  --text: #c9cfe4;
+  --text-strong: #ffffff;
+  --text-dim: #8089ad;
+  --accent-text: #16f2b3;
+  --glow-1: #8b5cf6;
+  --glow-2: #f626af;
+  --code-bg: linear-gradient(160deg, #0d1224 0%, #0a0d37 100%);
+  --hero-glow:
+    radial-gradient(60% 55% at 72% 0%, rgba(139, 92, 246, 0.3), transparent 70%),
+    radial-gradient(40% 40% at 8% 18%, rgba(246, 38, 175, 0.13), transparent 70%);
+  --shadow: 0 30px 80px -40px rgba(139, 92, 246, 0.6);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f6fb;
+  --bg-panel: #ffffff;
+  --bg-soft: #eceefa;
+  --line: #d9dcf0;
+  --line-soft: rgba(13, 18, 36, 0.08);
+  --text: #3a4263;
+  --text-strong: #0d1224;
+  --text-dim: #6b7396;
+  --accent-text: #0a8f6a;
+  --glow-1: #7c3aed;
+  --glow-2: #db2777;
+  --code-bg: linear-gradient(160deg, #0d1224 0%, #1a1f4a 100%);
+  --hero-glow:
+    radial-gradient(60% 55% at 72% 0%, rgba(124, 58, 237, 0.16), transparent 70%),
+    radial-gradient(40% 40% at 8% 18%, rgba(219, 39, 119, 0.08), transparent 70%);
+  --shadow: 0 30px 80px -45px rgba(76, 29, 149, 0.35);
+}

@@ -1,0 +1,223 @@
+// Page CV : barre d'outils à l'écran et feuille de papier (A4 ou Letter), puis règles d'impression.
+
+.cvpage {
+  min-height: 100vh;
+  padding-bottom: 3rem;
+  background: var(--bg-soft);
+
+  &__hint {
+    padding-top: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+.cvbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 0.75rem 0;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--line);
+
+  &__in {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    align-items: center;
+  }
+
+  &__info {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+  }
+
+  &__warn {
+    color: #f59e0b;
+  }
+
+  &__print {
+    margin-left: auto;
+  }
+}
+
+.sheet-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-x: auto;
+  transition: opacity 0.25s;
+
+  &.is-switching {
+    opacity: 0.5;
+  }
+}
+
+// La feuille garde toujours des couleurs de papier, quel que soit le thème du site.
+.sheet {
+  --paper: #ffffff;
+  --ink: #151a2d;
+  --ink-dim: #5a6180;
+  --rule: #c9ced9;
+  --brand: #5b21b6;
+  flex: none;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 14mm 15mm;
+  font-family: var(--font-body);
+  font-size: 10pt;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.35);
+
+  &--letter {
+    width: 8.5in;
+    min-height: 11in;
+  }
+
+  h1 {
+    font-size: 24pt;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  h2 {
+    padding-bottom: 2pt;
+    margin: 13pt 0 6pt;
+    font-size: 11pt;
+    color: var(--brand);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  p {
+    margin: 0 0 3pt;
+  }
+
+  &__head {
+    display: flex;
+    gap: 14pt;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__headline {
+    margin-top: 3pt;
+    font-family: var(--font-display);
+    font-size: 12pt;
+    color: var(--ink-dim);
+  }
+
+  &__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1pt 12pt;
+    margin-top: 7pt;
+    font-size: 9pt;
+
+    &--dim {
+      margin-top: 2pt;
+      color: var(--ink-dim);
+    }
+  }
+
+  &__auth {
+    margin-top: 4pt;
+    font-size: 9pt;
+    font-style: italic;
+    color: var(--ink-dim);
+  }
+
+  &__photo {
+    flex: none;
+    width: 28mm;
+    height: 35mm;
+    object-fit: cover;
+    border-radius: 3pt;
+  }
+
+  &__item {
+    margin-bottom: 7pt;
+  }
+
+  &__row {
+    display: flex;
+    gap: 10pt;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  &__when {
+    flex: none;
+    font-size: 9pt;
+    color: var(--ink-dim);
+  }
+
+  &__sub {
+    font-size: 9.5pt;
+    color: var(--ink-dim);
+  }
+
+  &__list {
+    padding-left: 12pt;
+    margin: 2pt 0 0;
+    list-style: disc;
+
+    li {
+      margin-bottom: 1pt;
+    }
+  }
+
+  &__skill {
+    margin-bottom: 2pt;
+  }
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .cvbar,
+  .cvpage__hint {
+    display: none !important;
+  }
+
+  .cvpage {
+    padding: 0;
+    background: none;
+  }
+
+  .sheet-wrap {
+    display: block;
+    padding: 0;
+    overflow: visible;
+  }
+
+  // Les marges viennent de @page (réglé par la page selon le marché).
+  .sheet {
+    width: auto;
+    min-height: 0;
+    padding: 0;
+    box-shadow: none;
+
+    &--letter {
+      width: auto;
+      min-height: 0;
+    }
+
+    &__item,
+    h2 {
+      break-inside: avoid;
+    }
+
+    h2 {
+      break-after: avoid;
+    }
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
