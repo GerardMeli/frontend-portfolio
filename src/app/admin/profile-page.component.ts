@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { FieldEditorComponent } from './field-editor.component';;
+import { Rec, PROFILE_FIELDS } from '../core/resources';
+import { AdminApiService, Problem, problemOf } from './admin-api.service';
+import { FieldEditorComponent } from './field-editor.component';
 
 /** Profil unique : créé à la première sauvegarde, modifié ensuite. */
 @Component({

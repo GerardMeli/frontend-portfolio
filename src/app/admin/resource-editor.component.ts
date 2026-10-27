@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { CollectionConfig, Field } from '../core/resources';
+import { CollectionConfig, Field, Rec } from '../core/resources';
+import { AdminApiService, Problem, problemOf } from './admin-api.service';
 import { FieldEditorComponent } from './field-editor.component';
 
 

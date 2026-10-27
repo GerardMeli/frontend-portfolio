@@ -9,9 +9,9 @@ import {
   ProjectView,
   Section,
   SkillGroupView,
-} from '../../../core/models';
-import { PortfolioService } from '../../../core/portfolio.service';
-import { formatDate, formatFullDate, formatPeriod, prettyUrl } from '../../../core/util';
+} from '../../core/models';
+import { PortfolioService } from '../../core/portfolio.service';
+import { formatDate, formatFullDate, formatPeriod, prettyUrl } from '../../core/util';
 
 const MM = 96 / 25.4; // pixels par millimètre
 const MARGIN_MM = 14;

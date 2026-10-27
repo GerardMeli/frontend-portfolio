@@ -1,7 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
 import { LANGS } from '../core/i18n';
 import { PortfolioService } from '../core/portfolio.service';
-import { Field } from '../core/resources';
+import { Field, Rec } from '../core/resources';
 
 /** Formulaire généré à partir d'une liste de champs (texte, dates, traductions, marchés...). */
 @Component({

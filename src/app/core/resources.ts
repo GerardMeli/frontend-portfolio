@@ -1,5 +1,7 @@
 import { LANGS } from '../core/i18n';
 
+export type Rec = Record<string, unknown>;
+
 export type FieldType =
   | 'text'
   | 'textarea'

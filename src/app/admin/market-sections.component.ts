@@ -1,5 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
+import { Rec } from '../core/resources';
+import { AdminApiService, Problem, problemOf } from './admin-api.service';
 
 interface Row {
   sectionType: string;
