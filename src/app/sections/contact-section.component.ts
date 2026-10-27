@@ -2,8 +2,8 @@ import { Component, inject, input } from '@angular/core';
 import { PortfolioService } from '../core/portfolio.service';
 import { Profile } from '../core/models';
 import { prettyUrl } from '../core/util';
-import { GlowDirective } from '../shared/glow.directive';
 import { SectionShellComponent } from '../shared/section-shell.component';
+import { GlowDirective } from '../shared/glow.directve';
 
 @Component({
   selector: 'app-contact-section',

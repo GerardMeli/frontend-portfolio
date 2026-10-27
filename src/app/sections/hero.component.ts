@@ -3,8 +3,8 @@ import { RouterLink } from '@angular/router';
 import { PortfolioService } from '../core/portfolio.service';
 import { Portfolio } from '../core/models';
 import { prettyUrl, scrollToAnchor } from '../core/util';
-import { GlowDirective } from '../shared/glow.directive';
 import { MarketSwitcherComponent } from '../shared/market-switcher.component';
+import { GlowDirective } from '../shared/glow.directve';
 
 interface Part {
   text: string;

@@ -1,9 +1,9 @@
 import { Component, computed } from '@angular/core';
 import { CustomItemView } from '../core/models';
 import { prettyUrl } from '../core/util';
-import { GlowDirective } from '../shared/glow.directive';
 import { RevealDirective } from '../shared/reveal.directive';
 import { SectionBase, SectionShellComponent } from '../shared/section-shell.component';
+import { GlowDirective } from '../shared/glow.directve';
 
 /** Section personnalisée créée depuis l'administration (bénévolat, références, publications...). */
 @Component({

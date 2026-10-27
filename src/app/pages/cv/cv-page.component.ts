@@ -1,11 +1,11 @@
 import { Component, DestroyRef, computed, effect, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { CvSheetComponent } from '../cv/cv-sheet.component';
 import { PortfolioService } from '../../core/portfolio.service';
 import { LangSwitcherComponent } from '../../shared/lang-switcher.component';
 import { MarketSwitcherComponent } from '../../shared/market-switcher.component';
 import { StatusComponent } from '../../shared/status.component';
-import { CvSheetComponent } from './cv-sheet.component';
 
 /** CV imprimable : change de format (A4 ou Letter) selon le marché choisi. */
 @Component({
