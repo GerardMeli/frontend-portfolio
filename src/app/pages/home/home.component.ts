@@ -54,6 +54,12 @@ import { StatusComponent } from '../../shared/status.component';
             @case ('SKILL') {
               <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
             }
+            @case ('PERSONAL_SKILL') {
+              <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+            }
+            @case ('PROFESSIONAL_SKILL') {
+              <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+            }
             @case ('CERTIFICATION') {
               <app-certifications-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
             }

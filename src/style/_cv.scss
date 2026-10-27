@@ -38,13 +38,29 @@
   &__print {
     margin-left: auto;
   }
+
+  @media (max-width: 520px) {
+    &__in {
+      gap: 0.55rem;
+    }
+
+    &__info {
+      flex-basis: 100%;
+      order: 1;
+    }
+
+    &__print {
+      margin-left: auto;
+    }
+  }
 }
 
 .sheet-wrap {
   display: flex;
   justify-content: center;
-  padding: 2rem 1rem;
-  overflow-x: auto;
+  min-width: 0;
+  padding: clamp(0.75rem, 3vw, 2rem) var(--page-gutter);
+  overflow-x: clip;
   transition: opacity 0.25s;
 
   &.is-switching {
@@ -59,10 +75,10 @@
   --ink-dim: #5a6180;
   --rule: #c9ced9;
   --brand: #5b21b6;
-  flex: none;
-  width: 210mm;
-  min-height: 297mm;
-  padding: 14mm 15mm;
+  flex: 0 1 auto;
+  width: min(210mm, 100%);
+  min-height: min(297mm, calc((100vw - 2 * var(--page-gutter)) * 1.4142));
+  padding: clamp(1rem, 4vw, 15mm);
   font-family: var(--font-body);
   font-size: 10pt;
   line-height: 1.45;
@@ -71,8 +87,8 @@
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.35);
 
   &--letter {
-    width: 8.5in;
-    min-height: 11in;
+    width: min(8.5in, 100%);
+    min-height: min(11in, calc((100vw - 2 * var(--page-gutter)) * 1.2941));
   }
 
   h1 {
@@ -144,6 +160,12 @@
     gap: 10pt;
     align-items: baseline;
     justify-content: space-between;
+    min-width: 0;
+  }
+
+  &__row > * {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   &__when {
@@ -199,6 +221,7 @@
     width: auto;
     min-height: 0;
     padding: 0;
+    flex: none;
     box-shadow: none;
 
     &--letter {

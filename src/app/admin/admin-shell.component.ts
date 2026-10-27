@@ -16,6 +16,9 @@ import { AuthService } from '../core/auth/service';
           }
         </nav>
       </aside>
+      @if (open()) {
+        <button type="button" class="adm__scrim" aria-label="Fermer le menu" (click)="open.set(false)"></button>
+      }
 
       <div class="adm__main">
         <header class="adm__top">

@@ -15,6 +15,8 @@ const LABELS: Record<string, string> = {
   EDUCATION: 'Formations',
   PROJECT: 'Projets',
   SKILL: 'Compétences',
+  PERSONAL_SKILL: 'Compétences personnelles',
+  PROFESSIONAL_SKILL: 'Compétences professionnelles',
   CERTIFICATION: 'Certifications',
   LANGUAGE: 'Langues',
 };

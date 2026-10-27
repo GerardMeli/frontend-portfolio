@@ -6,7 +6,7 @@
   z-index: 50;
   display: flex;
   align-items: center;
-  height: var(--nav-h);
+  min-height: var(--nav-h);
   border-bottom: 1px solid transparent;
   transition: background 0.3s, border-color 0.3s;
 
@@ -17,14 +17,18 @@
   }
 
   &__bar {
+    position: relative;
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.55rem clamp(0.5rem, 2vw, 1rem);
     align-items: center;
-    width: min(1180px, 100% - 2.5rem);
+    width: min(1440px, calc(100% - 2 * var(--page-gutter)));
+    padding-block: 0.65rem;
   }
 
   &__brand {
     display: flex;
+    order: 1;
     gap: 0.65rem;
     align-items: center;
     font-family: var(--font-display);
@@ -54,14 +58,18 @@
 
   &__links {
     position: absolute;
-    top: var(--nav-h);
+    top: calc(100% + 0.5rem);
     right: 0;
-    left: 0;
     display: none;
     flex-direction: column;
-    padding: 1rem 1.25rem 1.5rem;
+    width: min(24rem, 100%);
+    max-height: calc(100dvh - var(--nav-h) - 1rem);
+    padding: 0.65rem;
+    overflow-y: auto;
     background: var(--bg-panel);
-    border-bottom: 1px solid var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
 
     &.is-open {
       display: flex;
@@ -73,40 +81,59 @@
 
       &:hover {
         color: var(--text-strong);
+        background: var(--bg-soft);
       }
     }
 
     @media (min-width: 1200px) {
       position: static;
-      flex-direction: row;
-      gap: 0.15rem;
+      display: grid;
+      order: 3;
+      flex: 0 1 auto;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.25rem 0.4rem;
+      width: min(100%, 1260px);
+      max-width: 100%;
+      max-height: none;
       padding: 0;
+      overflow: visible;
       margin-inline: auto;
       background: none;
       border: 0;
-
-      &,
-      &.is-open {
-        display: flex;
-      }
+      border-radius: 0;
+      box-shadow: none;
 
       a {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.92rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 2.15rem;
+        padding: 0.25rem 0.4rem;
+        font-size: 0.86rem;
+        text-align: center;
+        overflow-wrap: normal;
+        text-wrap: balance;
+        border: 1px solid transparent;
         border-radius: 8px;
+        transition: color 0.2s, background 0.2s, border-color 0.2s;
+
+        &:hover {
+          color: var(--text-strong);
+          background: var(--bg-soft);
+          border-color: var(--line-soft);
+        }
       }
     }
   }
 
   &__tools {
     display: flex;
-    gap: 0.5rem;
+    order: 2;
+    gap: clamp(0.35rem, 1.5vw, 0.5rem);
     align-items: center;
     margin-left: auto;
-
-    @media (min-width: 1200px) {
-      margin-left: 0;
-    }
+    flex-shrink: 0;
   }
 
   &__burger {
@@ -129,7 +156,7 @@
   position: relative;
   display: grid;
   gap: clamp(2rem, 5vw, 4rem);
-  padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(3rem, 6vw, 5rem);
+  padding-block: clamp(2rem, 7vw, 5.5rem) clamp(3rem, 6vw, 5rem);
 
   @media (min-width: 960px) {
     grid-template-columns: 1.05fr 0.95fr;
@@ -167,6 +194,7 @@
   }
 
   &__name {
+    overflow-wrap: anywhere;
     padding-bottom: 0.08em;
     font-size: clamp(2.4rem, 6vw, 4.2rem);
     font-weight: 800;
@@ -458,8 +486,13 @@
   flex-wrap: wrap;
   gap: 0.5rem 1.5rem;
   justify-content: space-between;
-  padding-block: 2.5rem;
+  padding-block: clamp(1.5rem, 4vw, 2.5rem);
   font-size: 0.9rem;
   color: var(--text-dim);
   border-top: 1px solid var(--line-soft);
+
+  @media (max-width: 520px) {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
 }

@@ -12,7 +12,7 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 1.0625rem;
+  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
   line-height: 1.65;
   color: var(--text);
   background: var(--bg);
@@ -73,11 +73,23 @@ pre {
 }
 
 .wrap {
-  width: min(1180px, 100% - 2.5rem);
+  width: min(var(--content-max), calc(100% - 2 * var(--page-gutter)));
   margin-inline: auto;
 }
 
+app-home,
+app-cv-page,
+app-admin-shell,
+app-resource-page,
+app-profile-page,
+app-markets-page,
+app-login {
+  display: block;
+  min-width: 0;
+}
+
 main {
+  min-width: 0;
   overflow-x: clip;
   transition: opacity 0.25s;
 

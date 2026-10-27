@@ -260,15 +260,29 @@ export const RESOURCES: Record<string, ResourcePage> = {
   skills: {
     path: '/skill-categories',
     heading: 'Compétences',
-    intro: 'Catégories de compétences (Backend, Frontend, Outils...) et les compétences qu’elles contiennent.',
+    intro: 'Classez les catégories en compétences personnelles ou professionnelles, puis ajoutez les compétences qu’elles contiennent.',
     config: {
       label: 'Catégories',
       singular: 'Catégorie',
-      fields: [{ key: 'name', label: 'Nom de la catégorie', type: 'i18n', required: true }, visible],
+      fields: [
+        { key: 'name', label: 'Nom de la catégorie', type: 'i18n', required: true },
+        {
+          key: 'type',
+          label: 'Type de compétences',
+          type: 'select',
+          required: true,
+          options: [
+            { value: 'PERSONAL', label: 'Compétences personnelles' },
+            { value: 'PROFESSIONAL', label: 'Compétences professionnelles' },
+          ],
+        },
+        visible,
+      ],
       title: (c) => tr(c['name']),
+      subtitle: (c) => c['type'] === 'PERSONAL' ? 'Personnelles' : 'Professionnelles',
       reorder: true,
       hasVisible: true,
-      defaults: { visible: true },
+      defaults: { type: 'PROFESSIONAL', visible: true },
       child: skillItems,
     },
   },

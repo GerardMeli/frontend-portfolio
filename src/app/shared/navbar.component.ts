@@ -18,8 +18,8 @@ import { MarketSwitcherComponent } from './market-switcher.component';
         </a>
 
         <nav class="nav__links" [class.is-open]="open()" aria-label="Sections">
-          @for (section of sections(); track section.type) {
-            <a [href]="'#' + anchor(section.type)" (click)="pick($event, anchor(section.type))">{{ section.title }}</a>
+          @for (section of sections(); track section.type; let index = $index) {
+            <a [href]="'#' + anchor(section.type)" (click)="pick($event, anchor(section.type))">{{ sectionLabel(section.title, index) }}</a>
           }
           <a href="#contact" (click)="pick($event, 'contact')">{{ ui().contact }}</a>
         </nav>
@@ -78,6 +78,11 @@ export class NavbarComponent {
   protected readonly sections = computed(() => this.svc.portfolio()?.sections ?? []);
   protected readonly name = computed(() => this.svc.portfolio()?.profile.fullName ?? '');
   protected readonly initials = computed(() => initialsOf(this.name()));
+
+  protected sectionLabel(title: string, index: number): string {
+    const duplicates = this.sections().slice(0, index).filter((section) => section.title === title).length;
+    return duplicates ? `${title} ${duplicates + 1}` : title;
+  }
 
   protected onScroll(): void {
     this.scrolled.set(window.scrollY > 8);

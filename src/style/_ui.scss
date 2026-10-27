@@ -10,6 +10,11 @@
   border-radius: 999px;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+
   &--grad {
     color: #fff;
     background: var(--grad);
@@ -130,7 +135,8 @@
 
 .card {
   position: relative;
-  padding: 1.5rem;
+  min-width: 0;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -238,7 +244,7 @@
 }
 
 .section {
-  padding-block: clamp(3.5rem, 8vw, 6rem);
+  padding-block: var(--section-space);
   scroll-margin-top: var(--nav-h);
 
   &__title {
@@ -272,11 +278,11 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
 
   &--wide {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
   }
 }
 

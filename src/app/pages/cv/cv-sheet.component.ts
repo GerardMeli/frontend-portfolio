@@ -117,6 +117,20 @@ const MARGIN_MM = 14;
                 </p>
               }
             }
+            @case ('PERSONAL_SKILL') {
+              @for (g of skills(section); track $index) {
+                <p class="sheet__skill">
+                  @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
+                </p>
+              }
+            }
+            @case ('PROFESSIONAL_SKILL') {
+              @for (g of skills(section); track $index) {
+                <p class="sheet__skill">
+                  @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
+                </p>
+              }
+            }
             @case ('CERTIFICATION') {
               @for (c of certifications(section); track $index) {
                 <div class="sheet__row sheet__item">
