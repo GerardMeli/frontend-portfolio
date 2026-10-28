@@ -39,7 +39,7 @@ export class AdminApiService {
   }
 
   reorder(path: string, ids: unknown[]): Observable<void> {
-    return this.http.put<void>(this.url(`${path}/order`), ids);
+    return this.http.patch<void>(this.url(`${path}/reorder`), { ids });
   }
 
   private url(path: string): string {
