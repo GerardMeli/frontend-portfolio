@@ -1,28 +1,27 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { PortfolioService } from '../core/portfolio.service';
 import { ThemeService } from '../core/theme.service';
-import { anchorOf, initialsOf, scrollToAnchor } from '../core/util';
+import { buildNavItems } from '../core/nav-items';
+import { initialsOf, scrollToAnchor } from '../core/util';
 import { LangSwitcherComponent } from './lang-switcher.component';
 import { MarketSwitcherComponent } from './market-switcher.component';
 
+/**
+ * Barre du haut : logo, marché, langue, thème.
+ * Sur grand écran, les sections sont dans le menu vertical (FloatingNavComponent) ;
+ * ici elles ne servent que dans le menu déroulant des petits écrans.
+ */
 @Component({
   selector: 'app-navbar',
   imports: [MarketSwitcherComponent, LangSwitcherComponent],
   host: { '(window:scroll)': 'onScroll()' },
   template: `
     <header class="nav" [class.is-scrolled]="scrolled()">
-      <div class="wrap nav__bar">
+      <div class="nav__bar">
         <a class="nav__brand" href="#top" (click)="go($event, 'top')">
           <span class="nav__mark" aria-hidden="true">{{ initials() }}</span>
           <span class="nav__name">{{ name() }}</span>
         </a>
-
-        <nav class="nav__links" [class.is-open]="open()" aria-label="Sections">
-          @for (section of sections(); track section.type; let index = $index) {
-            <a [href]="'#' + anchor(section.type)" (click)="pick($event, anchor(section.type))">{{ sectionLabel(section.title, index) }}</a>
-          }
-          <a href="#contact" (click)="pick($event, 'contact')">{{ ui().contact }}</a>
-        </nav>
 
         <div class="nav__tools">
           <app-market-switcher [compact]="true" />
@@ -62,6 +61,15 @@ import { MarketSwitcherComponent } from './market-switcher.component';
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
           </button>
         </div>
+
+        <nav class="nav__links" [class.is-open]="open()" [attr.aria-label]="ui().menu">
+          @for (item of items(); track item.id) {
+            <a [href]="'#' + item.id" (click)="pick($event, item.id)">{{ item.label }}</a>
+            @for (child of item.children; track child.id) {
+              <a class="nav__sub" [href]="'#' + child.id" (click)="pick($event, child.id)">{{ child.label }}</a>
+            }
+          }
+        </nav>
       </div>
     </header>
   `,
@@ -72,17 +80,14 @@ export class NavbarComponent {
   protected readonly ui = this.svc.ui;
   protected readonly open = signal(false);
   protected readonly scrolled = signal(false);
-  protected readonly anchor = anchorOf;
   protected readonly go = scrollToAnchor;
 
-  protected readonly sections = computed(() => this.svc.portfolio()?.sections ?? []);
+  protected readonly items = computed(() => {
+    const p = this.svc.portfolio();
+    return p ? buildNavItems(p.sections, this.ui()) : [];
+  });
   protected readonly name = computed(() => this.svc.portfolio()?.profile.fullName ?? '');
   protected readonly initials = computed(() => initialsOf(this.name()));
-
-  protected sectionLabel(title: string, index: number): string {
-    const duplicates = this.sections().slice(0, index).filter((section) => section.title === title).length;
-    return duplicates ? `${title} ${duplicates + 1}` : title;
-  }
 
   protected onScroll(): void {
     this.scrolled.set(window.scrollY > 8);

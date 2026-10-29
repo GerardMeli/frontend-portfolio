@@ -9,6 +9,7 @@ import {
   ProjectView,
   Section,
   SkillGroupView,
+  SkillKind,
 } from '../../core/models';
 import { PortfolioService } from '../../core/portfolio.service';
 import { formatDate, formatFullDate, formatPeriod, prettyUrl } from '../../core/util';
@@ -111,24 +112,15 @@ const MARGIN_MM = 14;
               }
             }
             @case ('SKILL') {
-              @for (g of skills(section); track $index) {
-                <p class="sheet__skill">
-                  @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
-                </p>
-              }
-            }
-            @case ('PERSONAL_SKILL') {
-              @for (g of skills(section); track $index) {
-                <p class="sheet__skill">
-                  @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
-                </p>
-              }
-            }
-            @case ('PROFESSIONAL_SKILL') {
-              @for (g of skills(section); track $index) {
-                <p class="sheet__skill">
-                  @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
-                </p>
+              @for (sub of skillSubsections(section); track sub.kind) {
+                @if (sub.showTitle) {
+                  <h3 class="sheet__subtitle">{{ sub.label }}</h3>
+                }
+                @for (g of sub.groups; track $index) {
+                  <p class="sheet__skill">
+                    @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
+                  </p>
+                }
               }
             }
             @case ('CERTIFICATION') {
@@ -231,6 +223,21 @@ export class CvSheetComponent {
   }
   protected skills(s: Section): SkillGroupView[] {
     return s.items as SkillGroupView[];
+  }
+
+  /** Compétences professionnelles puis personnelles ; les titres ne s'affichent que si les deux existent. */
+  protected skillSubsections(s: Section): { kind: SkillKind; label: string; groups: SkillGroupView[]; showTitle: boolean }[] {
+    const groups = this.skills(s);
+    const kinds: SkillKind[] = ['PROFESSIONAL', 'PERSONAL'];
+    const subsections = kinds
+      .map((kind) => ({
+        kind,
+        label: kind === 'PROFESSIONAL' ? this.ui().skillsPro : this.ui().skillsPersonal,
+        groups: groups.filter((g) => (g.kind ?? 'PROFESSIONAL') === kind),
+        showTitle: false,
+      }))
+      .filter((sub) => sub.groups.length);
+    return subsections.map((sub) => ({ ...sub, showTitle: subsections.length > 1 }));
   }
   protected certifications(s: Section): CertificationView[] {
     return s.items as CertificationView[];

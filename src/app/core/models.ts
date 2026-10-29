@@ -70,8 +70,12 @@ export interface SkillView {
   level?: number;
 }
 
+/** Les deux sous-sections de la section Compétences. */
+export type SkillKind = 'PROFESSIONAL' | 'PERSONAL';
+
 export interface SkillGroupView {
   name?: string;
+  kind: SkillKind;
   skills: SkillView[];
 }
 

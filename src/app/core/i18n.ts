@@ -25,6 +25,8 @@ export interface UiText {
   demo: string;
   code: string;
   credential: string;
+  skillsPro: string;
+  skillsPersonal: string;
   footerMarket: string;
   cvPages: (pages: number, max: number) => string;
   cvTooLong: (max: number) => string;
@@ -58,6 +60,8 @@ const fr: UiText = {
   demo: 'Démo',
   code: 'Code',
   credential: 'Voir la certification',
+  skillsPro: 'Compétences professionnelles',
+  skillsPersonal: 'Compétences personnelles',
   footerMarket: 'CV affiché pour le marché',
   cvPages: (n, max) => `Environ ${n} page${n > 1 ? 's' : ''} sur ${max} maximum`,
   cvTooLong: (max) => `Ce CV dépasse ${max} pages pour ce marché. Réduisez le nombre d’éléments par section dans l’administration.`,
@@ -97,6 +101,8 @@ const en: UiText = {
   demo: 'Demo',
   code: 'Code',
   credential: 'View the credential',
+  skillsPro: 'Professional skills',
+  skillsPersonal: 'Personal skills',
   footerMarket: 'CV shown for the market',
   cvPages: (n, max) => `About ${n} page${n > 1 ? 's' : ''} of ${max} maximum`,
   cvTooLong: (max) => `This CV exceeds ${max} pages for this market. Reduce the number of items per section in the admin.`,

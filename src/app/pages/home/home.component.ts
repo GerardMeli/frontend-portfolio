@@ -11,6 +11,7 @@ import { HeroComponent } from '../../sections/hero.component';
 import { LanguagesSectionComponent } from '../../sections/languages-section.component';
 import { ProjectsSectionComponent } from '../../sections/projects-section.component';
 import { SkillsSectionComponent } from '../../sections/skills-section.component';
+import { FloatingNavComponent } from '../../shared/floating-nav.component';
 import { NavbarComponent } from '../../shared/navbar.component';
 import { StatusComponent } from '../../shared/status.component';
 
@@ -19,6 +20,7 @@ import { StatusComponent } from '../../shared/status.component';
   selector: 'app-home',
   imports: [
     NavbarComponent,
+    FloatingNavComponent,
     StatusComponent,
     HeroComponent,
     AboutSectionComponent,
@@ -37,42 +39,41 @@ import { StatusComponent } from '../../shared/status.component';
       <main [class.is-switching]="svc.loading()">
         <app-hero [portfolio]="p" />
 
-        @for (section of p.sections; track section.type) {
-          @switch (section.type) {
-            @case ('SUMMARY') {
-              <app-about-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+        <div class="page">
+          <aside class="page__side"><app-floating-nav /></aside>
+          <div class="page__content">
+            @for (section of p.sections; track section.type) {
+              @switch (section.type) {
+                @case ('SUMMARY') {
+                  <app-about-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('EXPERIENCE') {
+                  <app-experience-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('EDUCATION') {
+                  <app-education-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('PROJECT') {
+                  <app-projects-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('SKILL') {
+                  <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('CERTIFICATION') {
+                  <app-certifications-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @case ('LANGUAGE') {
+                  <app-languages-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+                @default {
+                  <app-custom-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
+                }
+              }
             }
-            @case ('EXPERIENCE') {
-              <app-experience-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('EDUCATION') {
-              <app-education-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('PROJECT') {
-              <app-projects-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('SKILL') {
-              <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('PERSONAL_SKILL') {
-              <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('PROFESSIONAL_SKILL') {
-              <app-skills-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('CERTIFICATION') {
-              <app-certifications-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @case ('LANGUAGE') {
-              <app-languages-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-            @default {
-              <app-custom-section [anchor]="anchor(section.type)" [title]="section.title" [items]="section.items" />
-            }
-          }
-        }
 
-        <app-contact-section [profile]="p.profile" />
+            <app-contact-section [profile]="p.profile" />
+          </div>
+        </div>
       </main>
 
       <footer class="footer wrap">
