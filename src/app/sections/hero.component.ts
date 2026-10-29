@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PortfolioService } from '../core/portfolio.service';
 import { Portfolio } from '../core/models';
-import { prettyUrl, scrollToAnchor } from '../core/util';
+import { mediaUrl, prettyUrl, scrollToAnchor } from '../core/util';
 import { MarketSwitcherComponent } from '../shared/market-switcher.component';
 import { GlowDirective } from '../shared/glow.directve';
 
@@ -22,8 +22,8 @@ interface CodeLine {
   template: `
     <section class="hero wrap" id="top">
       <div class="hero__copy">
-        @if (portfolio().market.showPhoto && portfolio().profile.photoUrl) {
-          <div class="hero__avatar"><img [src]="portfolio().profile.photoUrl" [alt]="portfolio().profile.fullName" /></div>
+        @if (photo(); as src) {
+          <div class="hero__avatar"><img [src]="src" [alt]="portfolio().profile.fullName" /></div>
         }
         <h1 class="hero__name">{{ portfolio().profile.fullName }}</h1>
         @if (portfolio().profile.headline) {
@@ -72,6 +72,12 @@ export class HeroComponent {
   protected readonly pretty = prettyUrl;
   protected readonly go = scrollToAnchor;
   readonly portfolio = input.required<Portfolio>();
+
+  /** Photo affichée seulement si le marché choisi l'autorise. */
+  protected readonly photo = computed(() => {
+    const p = this.portfolio();
+    return p.market.showPhoto ? mediaUrl(p.profile.photoUrl) : undefined;
+  });
 
   protected readonly location = computed(() => {
     const p = this.portfolio().profile;

@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { PortfolioService } from '../core/portfolio.service';
 import { ThemeService } from '../core/theme.service';
 import { buildNavItems } from '../core/nav-items';
-import { initialsOf, scrollToAnchor } from '../core/util';
+import { initialsOf, mediaUrl, scrollToAnchor } from '../core/util';
 import { LangSwitcherComponent } from './lang-switcher.component';
 import { MarketSwitcherComponent } from './market-switcher.component';
 
@@ -19,7 +19,11 @@ import { MarketSwitcherComponent } from './market-switcher.component';
     <header class="nav" [class.is-scrolled]="scrolled()">
       <div class="nav__bar">
         <a class="nav__brand" href="#top" (click)="go($event, 'top')">
-          <span class="nav__mark" aria-hidden="true">{{ initials() }}</span>
+          @if (photo(); as src) {
+            <img class="nav__mark nav__mark--img" [src]="src" alt="" />
+          } @else {
+            <span class="nav__mark" aria-hidden="true">{{ initials() }}</span>
+          }
           <span class="nav__name">{{ name() }}</span>
         </a>
 
@@ -88,6 +92,10 @@ export class NavbarComponent {
   });
   protected readonly name = computed(() => this.svc.portfolio()?.profile.fullName ?? '');
   protected readonly initials = computed(() => initialsOf(this.name()));
+  protected readonly photo = computed(() => {
+    const p = this.svc.portfolio();
+    return p?.market.showPhoto ? mediaUrl(p.profile.photoUrl) : undefined;
+  });
 
   protected onScroll(): void {
     this.scrolled.set(window.scrollY > 8);

@@ -1,8 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
-import { Rec, PROFILE_FIELDS } from '../core/resources';
-import { AdminApiService, Problem, problemOf } from './admin-api.service';
+import { Component, computed, inject, signal } from '@angular/core';
+import { mediaUrl } from '../core/util';
+import { AdminApiService, Problem, Rec, problemOf } from './admin-api.service';
 import { FieldEditorComponent } from './field-editor.component';
+import { PROFILE_FIELDS } from '../core/resources';
 
 /** Profil unique : créé à la première sauvegarde, modifié ensuite. */
 @Component({
@@ -13,6 +14,35 @@ import { FieldEditorComponent } from './field-editor.component';
       <h1>Profil</h1>
       <p>Identité, coordonnées et résumé. Les champs en deux langues sont traduits sur le site.</p>
     </header>
+
+    <section class="card photo-box">
+      <div class="photo-box__preview">
+        @if (preview(); as src) {
+          <img [src]="src" alt="Photo de profil" />
+        } @else {
+          <span>Aucune photo</span>
+        }
+      </div>
+      <div>
+        <h2 class="ed__title">Photo de profil</h2>
+        <p class="ed__hint">
+          JPEG, PNG ou WebP, 2 Mo maximum. Un portrait carré donne le meilleur rendu. Elle remplace le lien saisi plus bas
+          et ne s’affiche que sur les marchés où « Afficher la photo » est activé.
+        </p>
+        <div class="ed__actions">
+          <label class="btn btn--grad btn--sm">
+            {{ uploading() ? 'Envoi…' : photo() ? 'Changer l’image' : 'Choisir une image' }}
+            <input type="file" hidden accept="image/jpeg,image/png,image/webp" [disabled]="uploading()" (change)="onFile($event)" />
+          </label>
+          @if (photo()) {
+            <button type="button" class="btn btn--ghost btn--sm" (click)="removePhoto()">Supprimer</button>
+          }
+        </div>
+        @if (photoProblem(); as message) {
+          <p class="alert alert--error" role="alert">{{ message }}</p>
+        }
+      </div>
+    </section>
 
     <section class="card ed__form">
       @if (loading()) {
@@ -52,7 +82,15 @@ export class ProfilePageComponent {
   protected readonly saved = signal(false);
   protected readonly problem = signal<Problem | null>(null);
 
+  /** Photo téléversée (URL relative à l'API), ou null. */
+  protected readonly photo = signal<string | null>(null);
+  protected readonly uploading = signal(false);
+  protected readonly photoProblem = signal<string | null>(null);
+  /** Aperçu : la photo téléversée, sinon le lien saisi dans le formulaire. */
+  protected readonly preview = computed(() => mediaUrl(this.photo() ?? (this.model()['photoUrl'] as string | undefined)));
+
   constructor() {
+    this.api.photo().subscribe({ next: (r) => this.photo.set(r.url), error: () => undefined });
     this.api.get('/profile').subscribe({
       next: (profile) => {
         this.model.set(profile);
@@ -63,6 +101,36 @@ export class ProfilePageComponent {
         this.loading.set(false);
         if (err.status !== 404) this.problem.set(problemOf(err));
       },
+    });
+  }
+
+  protected onFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      this.photoProblem.set('Image trop lourde : 2 Mo maximum.');
+      return;
+    }
+    this.uploading.set(true);
+    this.photoProblem.set(null);
+    this.api.uploadPhoto(file).subscribe({
+      next: (r) => {
+        this.photo.set(r.url);
+        this.uploading.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.uploading.set(false);
+        this.photoProblem.set(problemOf(err).message);
+      },
+    });
+  }
+
+  protected removePhoto(): void {
+    this.api.deletePhoto().subscribe({
+      next: () => this.photo.set(null),
+      error: (err: HttpErrorResponse) => this.photoProblem.set(problemOf(err).message),
     });
   }
 

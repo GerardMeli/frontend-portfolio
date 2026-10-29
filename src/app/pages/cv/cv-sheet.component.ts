@@ -12,7 +12,7 @@ import {
   SkillKind,
 } from '../../core/models';
 import { PortfolioService } from '../../core/portfolio.service';
-import { formatDate, formatFullDate, formatPeriod, prettyUrl } from '../../core/util';
+import { formatDate, formatFullDate, formatPeriod, mediaUrl, prettyUrl } from '../../core/util';
 
 const MM = 96 / 25.4; // pixels par millimètre
 const MARGIN_MM = 14;
@@ -50,8 +50,8 @@ const MARGIN_MM = 14;
             <p class="sheet__auth">{{ profile().workAuthorization }}</p>
           }
         </div>
-        @if (portfolio().market.showPhoto && profile().photoUrl) {
-          <img class="sheet__photo" [src]="profile().photoUrl" [alt]="profile().fullName" />
+        @if (photo(); as src) {
+          <img class="sheet__photo" [src]="src" [alt]="profile().fullName" />
         }
       </header>
 
@@ -163,6 +163,9 @@ export class CvSheetComponent {
   protected readonly ui = this.svc.ui;
   protected readonly pretty = prettyUrl;
   protected readonly profile = computed(() => this.portfolio().profile);
+  protected readonly photo = computed(() =>
+    this.portfolio().market.showPhoto ? mediaUrl(this.profile().photoUrl) : undefined,
+  );
   protected readonly location = computed(() => [this.profile().city, this.profile().country].filter(Boolean).join(', '));
 
   constructor() {

@@ -1,3 +1,5 @@
+import { API_URL } from './config';
+
 /** Identifiant d'ancre d'une section (SKILL -> skill, CUSTOM_X -> custom-x). */
 export function anchorOf(type: string): string {
   return type.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -85,4 +87,10 @@ export function formatFullDate(iso: string | undefined, lang: string): string {
     year: 'numeric',
     timeZone: 'UTC',
   });
+}
+
+/** Les images servies par le backend ont une URL relative (/api/public/photo?v=...) : on y ajoute l'adresse du backend. */
+export function mediaUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  return url.startsWith('/') ? new URL(API_URL).origin + url : url;
 }

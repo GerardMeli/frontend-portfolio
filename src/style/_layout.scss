@@ -25,6 +25,7 @@
     justify-content: space-between;
     width: min(var(--content-max, 1180px), calc(100% - 2 * var(--page-gutter, 1.25rem)));
     padding-block: 0.65rem;
+    margin-inline: auto;
   }
 
   &__brand {
@@ -46,6 +47,13 @@
     color: #fff;
     background: var(--grad);
     border-radius: 10px;
+
+    &--img {
+      padding: 0;
+      object-fit: cover;
+      background: none;
+      box-shadow: 0 0 0 2px var(--violet);
+    }
   }
 
   &__name {
@@ -277,8 +285,8 @@
   }
 
   &__avatar {
-    width: 92px;
-    height: 92px;
+    width: 128px;
+    height: 128px;
     padding: 3px;
     margin-bottom: 1.5rem;
     background: var(--grad);
