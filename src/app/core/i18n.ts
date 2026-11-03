@@ -30,6 +30,7 @@ export interface UiText {
   footerMarket: string;
   cvPages: (pages: number, max: number) => string;
   cvTooLong: (max: number) => string;
+  cvCompact: string;
   born: (date: string) => string;
   theme: Record<string, string>;
   employment: Record<string, string>;
@@ -64,6 +65,7 @@ const fr: UiText = {
   skillsPersonal: 'Compétences personnelles',
   footerMarket: 'CV affiché pour le marché',
   cvPages: (n, max) => `Environ ${n} page${n > 1 ? 's' : ''} sur ${max} maximum`,
+  cvCompact: 'Texte resserré automatiquement pour tenir dans le nombre de pages du marché.',
   cvTooLong: (max) => `Ce CV dépasse ${max} pages pour ce marché. Réduisez le nombre d’éléments par section dans l’administration.`,
   born: (date) => `Né(e) le ${date}`,
   theme: { light: 'Thème clair', dark: 'Thème sombre', auto: 'Thème automatique' },
@@ -105,6 +107,7 @@ const en: UiText = {
   skillsPersonal: 'Personal skills',
   footerMarket: 'CV shown for the market',
   cvPages: (n, max) => `About ${n} page${n > 1 ? 's' : ''} of ${max} maximum`,
+  cvCompact: 'Text tightened automatically to fit the market’s page limit.',
   cvTooLong: (max) => `This CV exceeds ${max} pages for this market. Reduce the number of items per section in the admin.`,
   born: (date) => `Born ${date}`,
   theme: { light: 'Light theme', dark: 'Dark theme', auto: 'Automatic theme' },

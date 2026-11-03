@@ -1,4 +1,6 @@
 // Page CV : barre d'outils à l'écran et feuille de papier (A4 ou Letter), puis règles d'impression.
+// La feuille est en une colonne, sobre et dense. Le niveau de compactage (data-density 0 à 3)
+// resserre la taille du texte et les espacements quand le CV dépasse le nombre de pages du marché.
 
 .cvpage {
   min-height: 100vh;
@@ -55,17 +57,24 @@
 // La feuille garde toujours des couleurs de papier, quel que soit le thème du site.
 .sheet {
   --paper: #ffffff;
-  --ink: #151a2d;
-  --ink-dim: #5a6180;
-  --rule: #c9ced9;
-  --brand: #5b21b6;
+  --ink: #161a2c;
+  --ink-dim: #596079;
+  --rule: #d3d8e4;
+  --brand: #4c1d95;
+  --fs: 9.5pt;
+  --lh: 1.4;
+  --sec: 1.05em; // espace avant une section
+  --h2: 0.5em; // espace sous le titre de section
+  --item: 0.62em; // espace entre deux éléments
+  --tight: 0.18em; // petits espaces
+
   flex: none;
   width: 210mm;
   min-height: 297mm;
-  padding: 14mm 15mm;
-  font-family: var(--font-body);
-  font-size: 10pt;
-  line-height: 1.45;
+  padding: 12mm 14mm;
+  font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
+  font-size: var(--fs);
+  line-height: var(--lh);
   color: var(--ink);
   background: var(--paper);
   box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.35);
@@ -75,108 +84,201 @@
     min-height: 11in;
   }
 
-  h1 {
-    font-size: 24pt;
-    font-weight: 700;
-    color: var(--ink);
+  &[data-density='1'] {
+    --fs: 9pt;
+    --lh: 1.34;
+    --sec: 0.9em;
+    --h2: 0.42em;
+    --item: 0.5em;
+    --tight: 0.14em;
+  }
+  &[data-density='2'] {
+    --fs: 8.5pt;
+    --lh: 1.3;
+    --sec: 0.75em;
+    --h2: 0.34em;
+    --item: 0.4em;
+    --tight: 0.1em;
+  }
+  &[data-density='3'] {
+    --fs: 8pt;
+    --lh: 1.26;
+    --sec: 0.6em;
+    --h2: 0.26em;
+    --item: 0.3em;
+    --tight: 0.08em;
   }
 
-  h2 {
-    padding-bottom: 2pt;
-    margin: 13pt 0 6pt;
-    font-size: 11pt;
-    color: var(--brand);
-    border-bottom: 1px solid var(--rule);
+  h1,
+  h2,
+  h3,
+  p,
+  ul,
+  li {
+    margin: 0;
   }
 
-  p {
-    margin: 0 0 3pt;
-  }
-
+  // En-tête : nom et titre à gauche, photo à droite, puis une ligne de coordonnées.
   &__head {
     display: flex;
-    gap: 14pt;
     align-items: flex-start;
     justify-content: space-between;
   }
 
+  &__id {
+    flex: 1;
+    min-width: 0;
+  }
+
+  h1 {
+    font-family: var(--font-display, 'Sora', system-ui, sans-serif);
+    font-size: 2.1em;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
   &__headline {
-    margin-top: 3pt;
-    font-family: var(--font-display);
-    font-size: 12pt;
-    color: var(--ink-dim);
+    margin-top: 2pt;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--brand);
+  }
+
+  &__photo {
+    flex: none;
+    margin-left: 12pt;
+    width: 23mm;
+    height: 29mm;
+    object-fit: cover;
+    border-radius: 2pt;
   }
 
   &__contact {
     display: flex;
     flex-wrap: wrap;
-    gap: 1pt 12pt;
-    margin-top: 7pt;
-    font-size: 9pt;
+    margin: var(--item) 0 0;
+    padding: 0;
+    font-size: 0.93em;
+    list-style: none;
+
+    li {
+      margin: 0 12pt 1pt 0;
+    }
 
     &--dim {
-      margin-top: 2pt;
+      margin-top: 0;
       color: var(--ink-dim);
     }
   }
 
-  &__auth {
-    margin-top: 4pt;
-    font-size: 9pt;
-    font-style: italic;
-    color: var(--ink-dim);
+  // Sections
+  &__sec {
+    margin-top: var(--sec);
   }
 
-  &__photo {
-    flex: none;
-    width: 28mm;
-    height: 35mm;
-    object-fit: cover;
-    border-radius: 3pt;
+  h2 {
+    padding-bottom: 1.5pt;
+    margin-bottom: var(--h2);
+    font-family: var(--font-body, 'DM Sans', system-ui, sans-serif);
+    font-size: 0.9em;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--brand);
+    border-bottom: 0.75pt solid var(--rule);
+  }
+
+  &__subtitle {
+    margin: var(--item) 0 var(--tight);
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--ink);
   }
 
   &__item {
-    margin-bottom: 7pt;
+    margin-bottom: var(--item);
+    break-inside: avoid;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   &__row {
     display: flex;
-    gap: 10pt;
     align-items: baseline;
     justify-content: space-between;
+
+    strong {
+      font-weight: 700;
+      color: var(--ink);
+    }
   }
 
   &__when {
     flex: none;
-    font-size: 9pt;
+    margin-left: 10pt;
+    font-size: 0.93em;
     color: var(--ink-dim);
+    white-space: nowrap;
   }
 
   &__sub {
-    font-size: 9.5pt;
+    font-style: italic;
     color: var(--ink-dim);
   }
 
+  &__tech {
+    margin-left: 6pt;
+    font-size: 0.93em;
+    color: var(--ink-dim);
+  }
+
+  &__text {
+    margin-top: var(--tight);
+  }
+
   &__list {
-    padding-left: 12pt;
-    margin: 2pt 0 0;
+    padding-left: 1.05em;
+    margin-top: var(--tight);
     list-style: disc;
 
     li {
-      margin-bottom: 1pt;
+      margin-bottom: var(--tight);
+      padding-left: 0.1em;
     }
   }
 
+  // Compétences : une ligne par catégorie, noms alignés.
   &__skill {
-    margin-bottom: 2pt;
+    display: flex;
+    margin-bottom: var(--tight);
   }
 
-  &__subtitle {
-    margin: 6pt 0 3pt;
-    font-family: var(--font-body);
-    font-size: 10pt;
+  &__skill-name {
+    flex: none;
+    width: 30mm;
+    margin-right: 8pt;
     font-weight: 700;
     color: var(--ink);
+  }
+
+  // Certifications sur deux colonnes.
+  &__certs {
+    column-count: 2;
+    column-gap: 14pt;
+  }
+
+  &__cert {
+    display: block;
+    margin-bottom: var(--tight);
+    break-inside: avoid;
+
+    .sheet__when {
+      margin-left: 5pt;
+    }
   }
 }
 
@@ -203,25 +305,21 @@
   }
 
   // Les marges viennent de @page (réglé par la page selon le marché).
-  .sheet {
+  .sheet,
+  .sheet--letter {
     width: auto;
     min-height: 0;
     padding: 0;
     box-shadow: none;
+  }
 
-    &--letter {
-      width: auto;
-      min-height: 0;
-    }
+  .sheet__item,
+  .sheet__cert {
+    break-inside: avoid;
+  }
 
-    &__item,
-    h2 {
-      break-inside: avoid;
-    }
-
-    h2 {
-      break-after: avoid;
-    }
+  .sheet h2 {
+    break-after: avoid;
   }
 
   .reveal {

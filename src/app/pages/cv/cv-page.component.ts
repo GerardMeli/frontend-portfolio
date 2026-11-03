@@ -1,11 +1,11 @@
 import { Component, DestroyRef, computed, effect, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { CvSheetComponent } from '../cv/cv-sheet.component';
 import { PortfolioService } from '../../core/portfolio.service';
 import { LangSwitcherComponent } from '../../shared/lang-switcher.component';
 import { MarketSwitcherComponent } from '../../shared/market-switcher.component';
 import { StatusComponent } from '../../shared/status.component';
+import { CV_MARGIN_H_MM, CV_MARGIN_V_MM, CvSheetComponent } from './cv-sheet.component';
 
 /** CV imprimable : change de format (A4 ou Letter) selon le marché choisi. */
 @Component({
@@ -20,6 +20,9 @@ import { StatusComponent } from '../../shared/status.component';
             <app-market-switcher />
             <app-lang-switcher />
             <span class="cvbar__info" [class.cvbar__warn]="tooLong()">{{ ui().cvPages(pages(), p.market.maxPages) }}</span>
+            @if (density() > 0) {
+              <span class="cvbar__info">{{ ui().cvCompact }}</span>
+            }
             <button type="button" class="btn btn--grad btn--sm cvbar__print" (click)="print()">{{ ui().printCv }}</button>
           </div>
         </div>
@@ -43,6 +46,7 @@ export class CvPageComponent {
   private readonly sheet = viewChild(CvSheetComponent);
 
   protected readonly pages = computed(() => this.sheet()?.pagesUsed() ?? 1);
+  protected readonly density = computed(() => this.sheet()?.density() ?? 0);
   protected readonly tooLong = computed(() => {
     const p = this.svc.portfolio();
     return !!p && this.pages() > p.market.maxPages;
@@ -58,7 +62,7 @@ export class CvPageComponent {
       const p = this.svc.portfolio();
       if (!p) return;
       // Taille de page et marges d'impression selon le marché ; le nom du fichier PDF suit le titre.
-      pageStyle.textContent = `@page { size: ${p.market.pageFormat === 'LETTER' ? 'letter' : 'A4'}; margin: 14mm 15mm; }`;
+      pageStyle.textContent = `@page { size: ${p.market.pageFormat === 'LETTER' ? 'letter' : 'A4'}; margin: ${CV_MARGIN_V_MM}mm ${CV_MARGIN_H_MM}mm; }`;
       title.setTitle(`${p.profile.fullName} - CV ${p.market.code}`);
     });
 

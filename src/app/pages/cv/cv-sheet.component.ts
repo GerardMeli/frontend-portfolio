@@ -1,4 +1,15 @@
-import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import {
   CertificationView,
   CustomItemView,
@@ -15,16 +26,24 @@ import { PortfolioService } from '../../core/portfolio.service';
 import { formatDate, formatFullDate, formatPeriod, mediaUrl, prettyUrl } from '../../core/util';
 
 const MM = 96 / 25.4; // pixels par millimètre
-const MARGIN_MM = 14;
+export const CV_MARGIN_V_MM = 12;
+export const CV_MARGIN_H_MM = 14;
+/** Niveaux de compactage : 0 = confortable, 3 = très serré (taille du texte et espacements réduits). */
+const MAX_DENSITY = 3;
+/** Pour simplement gagner une page, on ne resserre pas au-delà de ce niveau (texte encore bien lisible). */
+const SAVE_MAX_DENSITY = 2;
+/** Dernière page remplie à moins de 15 % : on essaie de la rattraper en resserrant. */
+const SAVE_THRESHOLD = 0.15;
 
 /**
  * Feuille de CV au format du marché (A4 ou Letter), prête à imprimer.
- * Photo, infos personnelles, dates et ordre des sections suivent les règles du marché.
+ * Une seule colonne (lisible par les logiciels de recrutement), mise en page dense et sobre.
+ * Si le contenu dépasse le nombre de pages du marché, le texte est resserré automatiquement.
  */
 @Component({
   selector: 'app-cv-sheet',
   template: `
-    <article class="sheet" [class.sheet--letter]="portfolio().market.pageFormat === 'LETTER'">
+    <article class="sheet" [class.sheet--letter]="portfolio().market.pageFormat === 'LETTER'" [attr.data-density]="density()">
       <header class="sheet__head">
         <div class="sheet__id">
           <h1>{{ profile().fullName }}</h1>
@@ -39,15 +58,10 @@ const MARGIN_MM = 14;
             @if (profile().githubUrl; as url) { <li>{{ pretty(url) }}</li> }
             @if (profile().websiteUrl; as url) { <li>{{ pretty(url) }}</li> }
           </ul>
-          @if (portfolio().market.showPersonalDetails) {
+          @if (extras().length) {
             <ul class="sheet__contact sheet__contact--dim">
-              @if (profile().birthDate) { <li>{{ ui().born(fullDate(profile().birthDate)) }}</li> }
-              @if (profile().nationality) { <li>{{ profile().nationality }}</li> }
-              @if (profile().maritalStatus) { <li>{{ profile().maritalStatus }}</li> }
+              @for (line of extras(); track $index) { <li>{{ line }}</li> }
             </ul>
-          }
-          @if (profile().workAuthorization) {
-            <p class="sheet__auth">{{ profile().workAuthorization }}</p>
           }
         </div>
         @if (photo(); as src) {
@@ -61,7 +75,7 @@ const MARGIN_MM = 14;
           @switch (section.type) {
             @case ('SUMMARY') {
               @for (text of texts(section); track $index) {
-                <p>{{ text }}</p>
+                <p class="sheet__text">{{ text }}</p>
               }
             }
             @case ('EXPERIENCE') {
@@ -72,7 +86,7 @@ const MARGIN_MM = 14;
                     <span class="sheet__when">{{ period(e.startDate, e.endDate, e.current) }}</span>
                   </div>
                   <p class="sheet__sub">{{ e.company }}{{ e.location ? ', ' + e.location : '' }}</p>
-                  @if (e.description) { <p>{{ e.description }}</p> }
+                  @if (e.description) { <p class="sheet__text">{{ e.description }}</p> }
                   @if (e.tasks.length) {
                     <ul class="sheet__list">
                       @for (task of e.tasks; track $index) { <li>{{ task }}</li> }
@@ -89,7 +103,7 @@ const MARGIN_MM = 14;
                     <span class="sheet__when">{{ period(e.startDate, e.endDate, false) }}</span>
                   </div>
                   <p class="sheet__sub">{{ e.institution }}{{ e.location ? ', ' + e.location : '' }}</p>
-                  @if (e.description) { <p>{{ e.description }}</p> }
+                  @if (e.description) { <p class="sheet__text">{{ e.description }}</p> }
                 </div>
               }
             }
@@ -97,11 +111,10 @@ const MARGIN_MM = 14;
               @for (p of projects(section); track $index) {
                 <div class="sheet__item">
                   <div class="sheet__row">
-                    <strong>{{ p.name }}</strong>
+                    <span><strong>{{ p.name }}</strong>@if (p.techStack.length) { <span class="sheet__tech">{{ p.techStack.join(', ') }}</span> }</span>
                     <span class="sheet__when">{{ period(p.startDate, p.endDate, false) }}</span>
                   </div>
-                  @if (p.techStack.length) { <p class="sheet__sub">{{ p.techStack.join(', ') }}</p> }
-                  @if (p.description) { <p>{{ p.description }}</p> }
+                  @if (p.description) { <p class="sheet__text">{{ p.description }}</p> }
                   @if (p.highlights.length) {
                     <ul class="sheet__list">
                       @for (h of p.highlights; track $index) { <li>{{ h }}</li> }
@@ -117,22 +130,25 @@ const MARGIN_MM = 14;
                   <h3 class="sheet__subtitle">{{ sub.label }}</h3>
                 }
                 @for (g of sub.groups; track $index) {
-                  <p class="sheet__skill">
-                    @if (g.name) { <strong>{{ g.name }} : </strong> }{{ skillNames(g) }}
-                  </p>
+                  <div class="sheet__skill">
+                    <strong class="sheet__skill-name">{{ g.name }}</strong>
+                    <span>{{ skillNames(g) }}</span>
+                  </div>
                 }
               }
             }
             @case ('CERTIFICATION') {
-              @for (c of certifications(section); track $index) {
-                <div class="sheet__row sheet__item">
-                  <span><strong>{{ c.name }}</strong>{{ c.issuer ? ', ' + c.issuer : '' }}</span>
-                  <span class="sheet__when">{{ date(c.issuedOn) }}</span>
-                </div>
-              }
+              <div class="sheet__certs">
+                @for (c of certifications(section); track $index) {
+                  <p class="sheet__cert">
+                    <strong>{{ c.name }}</strong>{{ c.issuer ? ', ' + c.issuer : '' }}
+                    @if (date(c.issuedOn); as when) { <span class="sheet__when">{{ when }}</span> }
+                  </p>
+                }
+              </div>
             }
             @case ('LANGUAGE') {
-              <p>{{ languageLine(section) }}</p>
+              <p class="sheet__text">{{ languageLine(section) }}</p>
             }
             @default {
               @for (i of customItems(section); track $index) {
@@ -142,7 +158,7 @@ const MARGIN_MM = 14;
                     <span class="sheet__when">{{ period(i.startDate, i.endDate, false) }}</span>
                   </div>
                   @if (i.subtitle) { <p class="sheet__sub">{{ i.subtitle }}</p> }
-                  @if (i.description) { <p>{{ i.description }}</p> }
+                  @if (i.description) { <p class="sheet__text">{{ i.description }}</p> }
                 </div>
               }
             }
@@ -159,6 +175,13 @@ export class CvSheetComponent {
   readonly portfolio = input.required<Portfolio>();
   /** Nombre de pages estimé d'après la hauteur du contenu. */
   readonly pagesUsed = signal(1);
+  /** Niveau de compactage appliqué automatiquement (0 = aucun). */
+  readonly density = signal(0);
+
+  private trying = false; // essai de gain d'une page en cours
+  private locked = false; // essai déjà fait pour ce contenu
+  private baseDensity = 0;
+  private basePages = 1;
 
   protected readonly ui = this.svc.ui;
   protected readonly pretty = prettyUrl;
@@ -168,8 +191,32 @@ export class CvSheetComponent {
   );
   protected readonly location = computed(() => [this.profile().city, this.profile().country].filter(Boolean).join(', '));
 
+  /** Infos personnelles (selon le marché) et autorisation de travail. */
+  protected readonly extras = computed(() => {
+    const p = this.profile();
+    const lines: string[] = [];
+    if (this.portfolio().market.showPersonalDetails) {
+      if (p.birthDate) lines.push(this.ui().born(formatFullDate(p.birthDate, this.portfolio().lang)));
+      if (p.nationality) lines.push(p.nationality);
+      if (p.maritalStatus) lines.push(p.maritalStatus);
+    }
+    if (p.workAuthorization) lines.push(p.workAuthorization);
+    return lines;
+  });
+
   constructor() {
     const destroyRef = inject(DestroyRef);
+
+    // Nouveau marché ou nouvelle langue : on repart de la mise en page confortable.
+    effect(() => {
+      this.portfolio();
+      untracked(() => {
+        this.trying = false;
+        this.locked = false;
+        this.density.set(0);
+      });
+    });
+
     afterNextRender(() => {
       const sheet = this.host.nativeElement.querySelector<HTMLElement>('.sheet');
       if (!sheet || typeof ResizeObserver === 'undefined') return;
@@ -181,20 +228,47 @@ export class CvSheetComponent {
   }
 
   private measure(sheet: HTMLElement): void {
-    const pageHeight = this.portfolio().market.pageFormat === 'LETTER' ? 11 * 96 : 297 * MM;
-    const margin = MARGIN_MM * MM;
+    const market = this.portfolio().market;
+    const pageHeight = market.pageFormat === 'LETTER' ? 11 * 96 : 297 * MM;
+    const margin = CV_MARGIN_V_MM * MM;
     const usable = pageHeight - 2 * margin;
     const content = sheet.scrollHeight - 2 * margin;
-    this.pagesUsed.set(Math.max(1, Math.ceil(content / usable - 0.02)));
+    const fill = content / usable;
+    const pages = Math.max(1, Math.ceil(fill - 0.02));
+    this.pagesUsed.set(pages);
+    const density = this.density();
+
+    // 1. Trop long pour ce marché : on resserre d'un cran (la mesure se relance toute seule).
+    if (pages > market.maxPages && density < MAX_DENSITY) {
+      this.density.set(density + 1);
+      return;
+    }
+
+    // 2. Essai pour gagner une page quand la dernière est presque vide.
+    if (this.trying) {
+      if (pages < this.basePages) {
+        this.trying = false; // gagné
+      } else if (density < SAVE_MAX_DENSITY) {
+        this.density.set(density + 1);
+      } else {
+        // Pas de gain : on revient à la mise en page confortable.
+        this.trying = false;
+        this.locked = true;
+        this.density.set(this.baseDensity);
+      }
+      return;
+    }
+    if (!this.locked && pages > 1 && fill - (pages - 1) <= SAVE_THRESHOLD && density < SAVE_MAX_DENSITY) {
+      this.trying = true;
+      this.baseDensity = density;
+      this.basePages = pages;
+      this.density.set(density + 1);
+    }
   }
 
   protected date(iso?: string): string {
     const p = this.portfolio();
     return formatDate(iso, p.market.dateFormat, p.lang);
-  }
-
-  protected fullDate(iso?: string): string {
-    return formatFullDate(iso, this.portfolio().lang);
   }
 
   protected period(start?: string, end?: string, current = false): string {
@@ -242,6 +316,7 @@ export class CvSheetComponent {
       .filter((sub) => sub.groups.length);
     return subsections.map((sub) => ({ ...sub, showTitle: subsections.length > 1 }));
   }
+
   protected certifications(s: Section): CertificationView[] {
     return s.items as CertificationView[];
   }
